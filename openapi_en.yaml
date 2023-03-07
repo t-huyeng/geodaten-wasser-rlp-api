@@ -1,46 +1,286 @@
 openapi: "3.0.0"
 info:
-  description: "API Description"
+  description: "unofficial API specification for the Geodaten Wasser Rheinland-Pfalz API. Current without CORS support."
   version: "1.0.0"
-  title: "API Name"
-  x-office: "Amtsname"
+  title: "Geodata Water RLP API"
+  x-office: "Ministry for Climate Protection, Environment, Energy and Mobility (MKUEM) (RLP)"
   contact:
-    name: Responsible authority
-    email: behoerde@example.com
-    url: https://example.com
+    name: Ministry for Climate Protection, Environment, Energy and Mobility (MKUEM), Department of Water Management.
+    url: https://wasserportal.rlp-umwelt.de/
 
 servers:
-  - url: "https://warnung.bund.de/api31"
+  - url: "https://geodaten-wasser.rlp-umwelt.de/api"
 
 tags:
-  - name: default
+  - name: masterdata
+  - name: mainvalues
+  - name: waterlevel
+  - name: discharge
+  - name: images
 
 paths:
-  /dashboard/{AGS}.json:
+  /data/messstellen_wasserstand_wasserstaende_30:
     get:
-      summary: Name of endpoint
-      description: Here the function of the end point is described.
-      operationId: getAGS
+      summary: Water levels
+      description: Return of the measured value of the water level of the last 30 days.
+      operationId: getWasserstaende
       tags:
-        - default
+        - waterlevel
       responses:
-        '200':
-            description: OK
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Result'
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WaterLevelResult"
       parameters:
-        - in: path
-          required: true
-          name: AGS
-          schema:
-            type: string
-          description: Official area key - can be retrieved from [here](https://www.xrepository.de/api/xrepository/urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:rs_2021-07-31/download/Regionalschl_ssel_2021-07-31.json). The last 7 digits have to be replaced with "0000000" because data is only offered on the area level [Kreisebene](https://de.wikipedia.org/wiki/Amtlicher_Gemeindeschl%C3%BCssel).
-          example: "example-parameter"
+        - $ref: "#/components/parameters/MeasurementNumber"
 
+  /data/messstellen_wasserstand_aktuellewasserstaende_lastmesswert:
+    get:
+      summary: Current water levels
+      description: Returns the last measured value of the water level.
+      operationId: getCurrentWaterLevels
+      tags:
+        - waterlevel
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WaterLevelResult"
+      parameters:
+        - $ref: "#/components/parameters/MeasurementNumber"
+
+  /data/messstellen_wasserstand_hauptwerte:
+    get:
+      summary: water level main values
+      description: Returns the last measured value of the water level.
+      operationId: getWaterLevelMainValues
+      tags:
+        - mainvalues
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MainValueResult"
+      parameters:
+        - $ref: "#/components/parameters/MeasurementNumber"
+
+  /data/messstellen_wasserstand_hauptwerte_toptenhochwasser:
+    get:
+      summary: Water level main values top 10 floods
+      description: Returns the last measured value of the water level.
+      operationId: getWaterLevelMainValuesTop10HighWater
+      tags:
+        - mainvalues
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MainValueResult"
+      parameters:
+        - $ref: "#/components/parameters/MeasurementNumber"
+
+  /data/messstellen_wasserstand_hauptwerte_toptenniedrigwasser:
+    get:
+      summary: Water level main values top 10 low water
+      description: Returns the last measured value of the water level.
+      operationId: getWaterLevelMainValuesTop10LowWater.
+      tags:
+        - mainvalues
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MainValueResult"
+      parameters:
+        - $ref: "#/components/parameters/MeasurementNumber"
+
+  /data/messstellen_wasserstand_stammdaten:
+    get:
+      summary: Water level master data
+      description: Returns the master data of the measuring points.
+      operationId: getWaterLevelMasterData
+      tags:
+        - masterdata
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WaterLevelResult"
+      parameters:
+        - $ref: "#/components/parameters/MeasurementNumber"
+
+  /data/messstellen_wasserstand_jaehrlichkeiten_alljaehrlichkeiten:
+    get:
+      summary: annualities
+      description: Returns the annualities of the measuring points.
+      operationId: getAnnualities
+      tags:
+        - mainvalues
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WaterLevelResult"
+      parameters:
+        - $ref: "#/components/parameters/MeasurementNumber"
+
+  /data/messstellen_wasserstand_abflusswerte_letzteabflusswerte:
+    get:
+      summary: Discharge values
+      description: Returns the discharge values of the measuring points.
+      operationId: getDischargevalues
+      tags:
+        - discharge
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/dischargeResult"
+      parameters:
+        - $ref: "#/components/parameters/MeasurementNumber"
+
+  /images:
+    post:
+      summary: images
+      description: Returns the images of the measuring points.
+      operationId: getImages
+      tags:
+        - images
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WaterLevelResult"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                application:
+                  type: string
+                  example: level
+                resource:
+                  type: string
+                  example: photo
+                id:
+                  type: string
+                  example: "2718040300"
+        required: true
 
 components:
-    schemas:
-      Result:
+  schemas:
+    WaterLevelResult:
+      type: array
+      items:
+        type: object
+        properties:
+          measuring point number:
+            type: number
+            example: 2718040300
+          measuring point designation:
+            type: string
+            example: Altenahr
+          date:
+            type: string
+            example: 07.03.2023 14:00
+          time:
+            type: string
+            example: 14:00
+          SINGLE DATE:
+            type: string
+            example: 07.03.2023
+          water level:
+            type: string
+            example: "59"
+    dischargeResult:
+      type: array
+      items:
+        type: object
+        properties:
+          measuring point number:
+            type: number
+            example: 2718040300
+          measuring point designation:
+            type: string
+            example: Altenahr
+          date:
+            type: string
+            example: 07.03.2023 15:30
+          time:
+            type: string
+            example: 15:30
+          SINGLE DATE:
+            type: string
+            example: 07.03.2023
+          outflow:
+            type: string
+            example: "2522"
+
+    MainValueResult:
+      type: array
+      items:
+        type: object
+        properties:
+          date_ah:
+            type: string
+            example: 08.07.1976
+          wh:
+            type: number
+            example: 0.692
+          sh:
+            type: number
+            example: 0.292
+          measuring point number:
+            type: number
+            example: 2718040300
+          measurement_period_to:
+            type: string
+            example: 01.06.2019
+          ah:
+            type: number
+            example: 0.292
+          measuring point designation:
+            type: string
+            example: Altenahr
+          dgj_jn:
+            type: number
+            example: -1
+          measurement_period_from:
+            type: string
+            example: 01.06.1946
+          key:
+            type: string
+            example: NQ
+
+  parameters:
+    MeasurementNumber:
+      in: query
+      required: true
+      name: w
+      schema:
         type: string
+      description: Measuring point number
+      examples:
+        Altenahr:
+          value: "messstellennummer=2718040300"
+          summary: "Altenahr gauge"
+      # example: "gauge number=2718040300"

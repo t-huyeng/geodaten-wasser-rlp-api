@@ -1,45 +1,286 @@
 openapi: "3.0.0"
 info:
-  description: "API Description"
+  description: "inoffizielle API-Spezifikation für die Geodaten Wasser Rheinland-Pfalz API. Aktuelle ohne CORS-Unterstützung."
   version: "1.0.0"
-  title: "API Name"
-  x-office: "Amtsname"
+  title: "Geodaten Wasser RLP API"
+  x-office: "Ministerium für Klimaschutz, Umwelt, Energie und Mobilität (MKUEM) (RLP)"
   contact:
-    name: Zuständige Behörde
-    email: behoerde@example.de
-    url: https://example.de
+    name: Ministerium für Klimaschutz, Umwelt, Energie und Mobilität (MKUEM), Abteilung Wasserwirtschaft
+    url: https://wasserportal.rlp-umwelt.de/
 
 servers:
-  - url: "https://warnung.bund.de/api31"
+  - url: "https://geodaten-wasser.rlp-umwelt.de/api"
 
 tags:
-  - name: default
+  - name: Stammdaten
+  - name: Hauptwerte
+  - name: Wasserstand
+  - name: Abfluss
+  - name: Bilder
 
 paths:
-  /dashboard/{AGS}.json:
+  /data/messstellen_wasserstand_wasserstaende_30:
     get:
-      summary: Name des Endpoints
-      description: Hier wird die Funktion des Endpunktes beschrieben.
-      operationId: getAGS
+      summary: Wasserstände
+      description: Rückgabe der Messwertes des Wasserstands der letzten 30 Tage.
+      operationId: getWasserstaende
       tags:
-        - default
+        - Wasserstand
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Result"
+                $ref: "#/components/schemas/WasserstandResult"
       parameters:
-        - in: path
-          required: true
-          name: AGS
-          schema:
-            type: string
-          description: Amtlicher Gebietsschlüssel - kann z.B. von [hier](https://www.xrepository.de/api/xrepository/urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:rs_2021-07-31/download/Regionalschl_ssel_2021-07-31.json) bezogen werden. Die Letzten 7 Stellen müssen dabei mit "0000000" ersetzt werden, weil die Daten nur auf [Kreisebene](https://de.wikipedia.org/wiki/Amtlicher_Gemeindeschl%C3%BCssel) bereitgestellt werden.
-          example: "example-parameter"
+        - $ref: "#/components/parameters/Messstellennummer"
+
+  /data/messstellen_wasserstand_aktuellewasserstaende_lastmesswert:
+    get:
+      summary: Aktuelle Wasserstände
+      description: Rückgabe des letzten Messwertes des Wasserstands.
+      operationId: getAktuelleWasserstaende
+      tags:
+        - Wasserstand
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WasserstandResult"
+      parameters:
+        - $ref: "#/components/parameters/Messstellennummer"
+
+  /data/messstellen_wasserstand_hauptwerte:
+    get:
+      summary: Wasserstand Hauptwerte
+      description: Rückgabe des letzten Messwertes des Wasserstands.
+      operationId: getWasserstandHauptwerte
+      tags:
+        - Hauptwerte
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HauptwerteResult"
+      parameters:
+        - $ref: "#/components/parameters/Messstellennummer"
+
+  /data/messstellen_wasserstand_hauptwerte_toptenhochwasser:
+    get:
+      summary: Wasserstand Hauptwerte Top 10 Hochwasser
+      description: Rückgabe des letzten Messwertes des Wasserstands.
+      operationId: getWasserstandHauptwerteTop10Hochwasser
+      tags:
+        - Hauptwerte
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HauptwerteResult"
+      parameters:
+        - $ref: "#/components/parameters/Messstellennummer"
+
+  /data/messstellen_wasserstand_hauptwerte_toptenniedrigwasser:
+    get:
+      summary: Wasserstand Hauptwerte Top 10 Tiefwasser
+      description: Rückgabe des letzten Messwertes des Wasserstands.
+      operationId: getWasserstandHauptwerteTop10Tiefwasser
+      tags:
+        - Hauptwerte
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HauptwerteResult"
+      parameters:
+        - $ref: "#/components/parameters/Messstellennummer"
+
+  /data/messstellen_wasserstand_stammdaten:
+    get:
+      summary: Wasserstand Stammdaten
+      description: Rückgabe der Stammdaten der Messstellen.
+      operationId: getWasserstandStammdaten
+      tags:
+        - Stammdaten
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WasserstandResult"
+      parameters:
+        - $ref: "#/components/parameters/Messstellennummer"
+
+  /data/messstellen_wasserstand_jaehrlichkeiten_alljaehrlichkeiten:
+    get:
+      summary: Jährlichkeiten
+      description: Rückgabe der Jährlichkeiten der Messstellen.
+      operationId: getJaehrlichkeiten
+      tags:
+        - Hauptwerte
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WasserstandResult"
+      parameters:
+        - $ref: "#/components/parameters/Messstellennummer"
+
+  /data/messstellen_wasserstand_abflusswerte_letzteabflusswerte:
+    get:
+      summary: Abflusswerte
+      description: Rückgabe der Abflusswerte der Messstellen.
+      operationId: getAbflusswerte
+      tags:
+        - Abfluss
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AbflussResult"
+      parameters:
+        - $ref: "#/components/parameters/Messstellennummer"
+
+  /images:
+    post:
+      summary: Bilder
+      description: Rückgabe der Bilder der Messstellen.
+      operationId: getBilder
+      tags:
+        - Bilder
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WasserstandResult"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                application:
+                  type: string
+                  example: pegel
+                resource:
+                  type: string
+                  example: foto
+                id:
+                  type: string
+                  example: "2718040300"
+        required: true
 
 components:
   schemas:
-    Result:
-      type: string
+    WasserstandResult:
+      type: array
+      items:
+        type: object
+        properties:
+          messstellennummer:
+            type: number
+            example: 2718040300
+          messstellenbezeichnung:
+            type: string
+            example: Altenahr
+          datum:
+            type: string
+            example: 07.03.2023 14:00
+          uhrzeit:
+            type: string
+            example: 14:00
+          singledatum:
+            type: string
+            example: 07.03.2023
+          wasserstand:
+            type: string
+            example: "59"
+    AbflussResult:
+      type: array
+      items:
+        type: object
+        properties:
+          messstellennummer:
+            type: number
+            example: 2718040300
+          messstellenbezeichnung:
+            type: string
+            example: Altenahr
+          datum:
+            type: string
+            example: 07.03.2023 15:30
+          uhrzeit:
+            type: string
+            example: 15:30
+          singledatum:
+            type: string
+            example: 07.03.2023
+          abfluss:
+            type: string
+            example: "2522"
+
+    HauptwerteResult:
+      type: array
+      items:
+        type: object
+        properties:
+          datum_ah:
+            type: string
+            example: 08.07.1976
+          wh:
+            type: number
+            example: 0.692
+          sh:
+            type: number
+            example: 0.292
+          messstellennummer:
+            type: number
+            example: 2718040300
+          messzeitraum_bis:
+            type: string
+            example: 01.06.2019
+          ah:
+            type: number
+            example: 0.292
+          messstellenbezeichnung:
+            type: string
+            example: Altenahr
+          dgj_jn:
+            type: number
+            example: -1
+          messzeitraum_von:
+            type: string
+            example: 01.06.1946
+          key:
+            type: string
+            example: NQ
+
+  parameters:
+    Messstellennummer:
+      in: query
+      required: true
+      name: w
+      schema:
+        type: string
+      description: Messstellennummer
+      examples:
+        Altenahr:
+          value: "messstellennummer=2718040300"
+          summary: "Pegel Altenahr"
+      # example: "messstellennummer=2718040300"
